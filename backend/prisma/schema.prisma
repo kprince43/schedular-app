@@ -8,21 +8,42 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String       @id @default(uuid())
+  email         String       @unique
   name          String
   password      String
-  role          Role      @default(USER)
-  isVerified    Boolean   @default(false)
+  role          Role         @default(USER)
+  isVerified    Boolean      @default(false)
   refreshToken  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   tasks         Task[]
   events        Event[]
   sessions      UserSession[]
+  schedules     Schedule[]
 
   @@map("users")
+}
+
+model Schedule {
+  id          String           @id @default(uuid())
+  title       String
+  description String?
+  category    ScheduleCategory @default(OTHER)
+  priority    Priority         @default(MEDIUM)
+  status      ScheduleStatus   @default(PENDING)
+  startTime   DateTime
+  endTime     DateTime
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([startTime])
+  @@map("schedules")
 }
 
 model Task {
@@ -57,12 +78,12 @@ model Event {
 }
 
 model UserSession {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token       String    @unique
-  expiresAt   DateTime
-  createdAt   DateTime  @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
   @@map("user_sessions")
 }
@@ -77,6 +98,23 @@ enum TaskStatus {
   IN_PROGRESS
   DONE
   CANCELLED
+}
+
+enum ScheduleStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ScheduleCategory {
+  WORK
+  PERSONAL
+  HEALTH
+  EDUCATION
+  FINANCE
+  SOCIAL
+  OTHER
 }
 
 enum Priority {
