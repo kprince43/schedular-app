@@ -3,8 +3,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import authRoutes     from './routes/auth.routes';
-import scheduleRoutes from './routes/schedule.routes';
+import authRoutes      from './routes/auth.routes';
+import scheduleRoutes  from './routes/schedule.routes';
+import analyticsRoutes from './routes/analytics.routes';
+import routineRoutes   from './routes/routine.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -18,7 +20,7 @@ app.use(cors({
 }));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, max: 200,
+  windowMs: 15 * 60 * 1000, max: 300,
   message: { success: false, message: 'Too many requests, please try again later' },
   standardHeaders: true, legacyHeaders: false,
 });
@@ -39,8 +41,10 @@ app.get('/health', (_req, res) => {
   res.json({ success: true, message: 'Server is healthy', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/auth',      authLimiter, authRoutes);
+app.use('/api/auth',      authLimiter,  authRoutes);
 app.use('/api/schedules', scheduleRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/routines',  routineRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

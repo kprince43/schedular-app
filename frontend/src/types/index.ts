@@ -92,3 +92,77 @@ export interface Task {
   dueDate?: string; completedAt?: string;
   createdAt: string; updatedAt: string;
 }
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+export interface AnalyticsSummary {
+  total: number; completed: number; missed: number;
+  pending: number; inProgress: number; cancelled: number;
+  completionRate: number; productivityScore: number;
+  streak: number; weeklyRate: number;
+}
+
+export interface ChartDataPoint { name: string; value: number; }
+
+export interface DailyTrendPoint {
+  date: string; label: string; created: number; completed: number;
+}
+
+export interface WeeklyActivityPoint {
+  day: string; total: number; completed: number; rate: number;
+}
+
+export interface HourlyPoint { hour: string; count: number; }
+
+export interface AnalyticsData {
+  summary:            AnalyticsSummary;
+  byCategory:         ChartDataPoint[];
+  byPriority:         ChartDataPoint[];
+  byStatus:           ChartDataPoint[];
+  dailyTrend:         DailyTrendPoint[];
+  weeklyActivity:     WeeklyActivityPoint[];
+  hourlyDistribution: HourlyPoint[];
+}
+
+// ── Routines ──────────────────────────────────────────────────────────────────
+export type RoutineFrequency  = 'DAILY' | 'WEEKLY' | 'WEEKDAYS' | 'WEEKENDS';
+export type RoutineLogStatus  = 'PENDING' | 'DONE' | 'SKIPPED' | 'MISSED';
+
+export interface RoutineLog {
+  id: string; routineId: string;
+  date: string; status: RoutineLogStatus; note: string | null;
+  createdAt: string; updatedAt: string;
+}
+
+export interface Routine {
+  id: string; title: string; description: string | null;
+  frequency: RoutineFrequency; targetDays: number[];
+  startTime: string; endTime: string;
+  category: ScheduleCategory; isActive: boolean;
+  userId: string; createdAt: string; updatedAt: string;
+  logs?: RoutineLog[];
+}
+
+export interface TodayRoutine extends Routine {
+  todayLog:    RoutineLog | null;
+  todayStatus: RoutineLogStatus;
+}
+
+export interface RoutineFormValues {
+  title: string; description?: string;
+  frequency: RoutineFrequency; targetDays: number[];
+  startTime: string; endTime: string;
+  category: ScheduleCategory; isActive: boolean;
+}
+
+export interface RoutineOverviewItem {
+  id: string; title: string; category: ScheduleCategory;
+  frequency: RoutineFrequency; isActive: boolean;
+  adherence: number; streak: number; total: number; done: number;
+}
+
+export interface RoutineAnalyticsData {
+  routine: { id: string; title: string; frequency: string };
+  summary: { total: number; done: number; skipped: number; missed: number; adherence: number; streak: number; bestStreak: number };
+  last30:  { date: string; status: string }[];
+  dowAdherence: { day: string; done: number; total: number; adherence: number }[];
+}

@@ -14,15 +14,15 @@ interface FilterBarProps {
 export default function FilterBar({ filters, onChange, total }: FilterBarProps) {
   const [search, setSearch] = useState(filters.search || '');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Debounce search
   useEffect(() => {
-    clearTimeout(timer.current);
+    if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       onChange({ ...filters, search: search || undefined });
     }, 350);
-    return () => clearTimeout(timer.current);
+    return () => { if (timer.current) clearTimeout(timer.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
